@@ -80,4 +80,22 @@ class MinimaxSearch:
                 temp[r][c] = current
 
                 value = min(
+                    value,
+                    self.minimax(temp, depth - 1, alpha, beta, True, player)
+                )
+
+                beta = min(beta, value)
+
+                if alpha >= beta:
+                    break
+
+            return value
+
+    def evaluate(self, board, player):
+
+        score = 0
+
+        for move in get_candidate_moves(board):
+            score += evaluate_move(board, move, player)
+
         return score
