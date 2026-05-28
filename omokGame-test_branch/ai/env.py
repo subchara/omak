@@ -90,4 +90,34 @@ class GomokuEnv(gym.Env):
 
                     dist = abs(r - center) + abs(c - center)
 
+                    reward += max(0, 0.01 * (7 - dist))
+
+        return reward
+    
+    def _get_obs(self):
+
+        current = self.board.current_player
+        opponent = 3 - current
+
+        ch1 = (self.board.board == current).astype(np.float32)
+        ch2 = (self.board.board == opponent).astype(np.float32)
+        ch3 = np.full_like(ch1, current - 1, dtype=np.float32)
+
+        mask = self.action_masks().reshape(self.board_size, self.board_size)
+
+        ch4 = mask.astype(np.float32)
+
+        return np.stack([ch1, ch2, ch3, ch4], axis=0)
+
+    def action_masks(self):
+
+        mask = np.zeros(self.board_size * self.board_size, dtype=bool)
+
+        moves = get_candidate_moves(self.board.board)
+
+        for r, c in moves:
+
+            idx = r * self.board_size + c
+            mask[idx] = True
+
         return mask
